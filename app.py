@@ -2,25 +2,19 @@ import os
 import requests
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 from blackbook_service import BlackbookService
 from market_listings_service import MarketListingsService
 
-load_dotenv()
+# Load environment variables with full path for PythonAnywhere
+load_dotenv('/home/Rahul2207/BlackbookFetcher/.env')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', os.urandom(24).hex())
 
 CORS(app)
 
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
-)
+# Rate limiter removed - unlimited car appraisals!
 
 blackbook_service = BlackbookService()
 market_listings_service = MarketListingsService()
@@ -37,7 +31,6 @@ def admin():
 
 
 @app.route('/api/test-credentials', methods=['POST'])
-@limiter.limit("10 per minute")
 def test_credentials():
     try:
         result = blackbook_service.test_credentials()
@@ -51,7 +44,6 @@ def test_credentials():
 
 
 @app.route('/api/fetch-vehicle', methods=['POST'])
-@limiter.limit("20 per minute")
 def fetch_vehicle():
     try:
         data = request.get_json()
@@ -110,7 +102,6 @@ def get_schema():
 
 
 @app.route('/api/pricing-cards', methods=['POST'])
-@limiter.limit("20 per minute")
 def pricing_cards():
     """
     Fetch vehicle data and pricing for all Canadian provinces
@@ -192,7 +183,6 @@ def pricing_cards():
 
 
 @app.route('/api/decode-vin', methods=['POST'])
-@limiter.limit("30 per minute")
 def decode_vin():
     """
     Decode VIN using NHTSA's free VIN decoder API
@@ -336,7 +326,6 @@ def decode_vin():
 
 
 @app.route('/api/market-listings', methods=['POST'])
-@limiter.limit("20 per minute")
 def market_listings():
     """
     Fetch real market listings from AutoTrader Canada
@@ -435,3 +424,4 @@ def health_check():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=os.getenv('FLASK_ENV') == 'development')
+
