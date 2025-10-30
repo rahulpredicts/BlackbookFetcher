@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackbook Vehicle Lookup</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER SECTION -->
+        <header>
+            <h1>VIN VALUE HUB</h1>
+            <p class="subtitle">Fetch vehicle data by VIN and odometer reading</p>
+            <nav>
+                <a href="/" class="active">Vehicle Lookup</a>
+                <a href="/admin">Admin Settings</a>
+            </nav>
+        </header>
+
+        <!-- MAIN CONTENT SECTION -->
+        <main>
+            <!-- INPUT FORM CARD -->
+            <div class="card">
+                <h2>Enter Vehicle Information</h2>
+                <form id="vehicleForm">
+                    <!-- VIN INPUT -->
+                    <div class="form-group">
+                        <label for="vin">VIN (17 characters)</label>
+                        <input 
+                            type="text" 
+                            id="vin" 
+                            name="vin" 
+                            maxlength="17" 
+                            required 
+                            placeholder="1HGBH41JXMN109186"
+                            pattern="[A-HJ-NPR-Z0-9]{17}"
+                            title="VIN must be exactly 17 alphanumeric characters"
+                        >
+                        <small class="help-text">Enter the 17-character Vehicle Identification Number</small>
+                    </div>
+
+                    <!-- ODOMETER INPUT -->
+                    <div class="form-group">
+                        <label for="odometer">Odometer Reading (km)</label>
+                        <input 
+                            type="number" 
+                            id="odometer" 
+                            name="odometer" 
+                            min="0" 
+                            max="999999" 
+                            required 
+                            placeholder="50000"
+                        >
+                        <small class="help-text">Enter the current odometer reading in kilometres</small>
+                    </div>
+
+                    <!-- BUYING PRICE INPUT -->
+                    <div class="form-group">
+                        <label for="buyingPrice">Your Buying Price (Optional)</label>
+                        <input 
+                            type="number" 
+                            id="buyingPrice" 
+                            name="buyingPrice" 
+                            min="0" 
+                            max="999999" 
+                            placeholder="25000"
+                        >
+                        <small class="help-text">Enter the price you paid or plan to pay - we'll analyze if it's a good deal</small>
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <button type="submit" class="btn btn-primary">Fetch Vehicle Data</button>
+                </form>
+            </div>
+
+            <!-- LOADING INDICATOR (hidden by default) -->
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Fetching vehicle data...</p>
+            </div>
+
+            <!-- ERROR MESSAGE (hidden by default) -->
+            <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+
+            <!-- SUCCESS MESSAGE (hidden by default) -->
+            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+            <!-- VEHICLE DATA RESULTS (hidden by default) -->
+            <div id="resultContainer" style="display: none;">
+                <div class="card">
+                    <h2>Vehicle Data</h2>
+                    <div id="vehicleData" class="vehicle-data"></div>
+                </div>
+            </div>
+
+            <!-- ⭐ VIN DECODE SECTION (hidden by default) ⭐ -->
+            <div id="vinDecodeContainer" style="display: none;">
+                <div class="card">
+                    <h2>🔍 Vehicle Information (VIN Decoded)</h2>
+                    <div id="vinDecodeContent" class="vin-decode"></div>
+                </div>
+            </div>
+
+            <!-- ⭐ AUCTION RECOMMENDATION SECTION (hidden by default) ⭐ -->
+            <div id="recommendationContainer" style="display: none;">
+                <div class="card">
+                    <h2>🎯 Auction Buy Recommendation</h2>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="provinceSelector">Select Province/Territory:</label>
+                        <select id="provinceSelector" class="province-selector">
+                            <option value="Alberta">Alberta</option>
+                            <option value="British Columbia">British Columbia</option>
+                            <option value="Manitoba">Manitoba</option>
+                            <option value="New Brunswick">New Brunswick</option>
+                            <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+                            <option value="Northwest Territories">Northwest Territories</option>
+                            <option value="Nova Scotia">Nova Scotia</option>
+                            <option value="Nunavut">Nunavut</option>
+                            <option value="Ontario" selected>Ontario</option>
+                            <option value="Prince Edward Island">Prince Edward Island</option>
+                            <option value="Quebec">Quebec</option>
+                            <option value="Saskatchewan">Saskatchewan</option>
+                            <option value="Yukon">Yukon</option>
+                        </select>
+                        <small class="help-text">Choose your province to see auction recommendations based on local market conditions</small>
+                    </div>
+                    <div id="recommendationContent" class="recommendation"></div>
+                </div>
+            </div>
+
+            <!-- ⭐ MARKET TRENDS SECTION (hidden by default) ⭐ -->
+            <div id="marketTrendsContainer" style="display: none;">
+                <div class="card">
+                    <h2>📈 Market Trends Analysis</h2>
+                    <div id="marketTrendsContent" class="market-trends"></div>
+                </div>
+            </div>
+
+            <!-- ⭐ REAL MARKET LISTINGS SECTION - NOW FIRST! (hidden by default) ⭐ -->
+            <div id="marketListingsContainer" style="display: none;">
+                <div class="card market-priority">
+                    <div class="priority-badge">✨ REAL MARKET DATA</div>
+                    <h2 style="color: #4CAF50;">🚗 Actual Cars For Sale Right Now</h2>
+                    <p style="color: #666; margin-bottom: 15px; font-size: 1.1rem;">Real listings from AutoTrader Canada showing what similar vehicles are <strong>actually selling for</strong> in the Canadian market.</p>
+                    <div id="marketSummary" class="market-summary" style="display: none;">
+                        <!-- Market statistics will be inserted here -->
+                    </div>
+                    <div id="marketListingsGrid" class="market-listings-grid">
+                        <!-- Market listings will be dynamically inserted here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ⭐ PRICING CARDS SECTION (hidden by default) ⭐ -->
+            <div id="pricingCardsContainer" style="display: none;">
+                <div class="card warning-card">
+                    <div class="warning-banner">
+                        <strong>⚠️ IMPORTANT: Book Values vs Real Market Prices</strong>
+                        <p>Blackbook values below are <strong>rough condition book values</strong> - NOT real market prices. Rough condition represents vehicles with visible wear and tear at the lower end of the pricing spectrum. See "Real Market Data" section above for actual asking prices.</p>
+                    </div>
+                </div>
+                
+                <h2 id="pricingCardsTitle">📊 Blackbook Reference Values (Rough Condition)</h2>
+                <p style="color: #888; margin-bottom: 20px; font-style: italic;">Raw rough condition book valuations across all 13 Canadian provinces. Scroll up to see real market prices.</p>
+                <div id="pricingCardsGrid" class="pricing-cards-grid">
+                    <!-- Pricing cards will be dynamically inserted here by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- LOAD JAVASCRIPT FILE -->
+    <script src="/static/script.js"></script>
+</body>
+</html>
