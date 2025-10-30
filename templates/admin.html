@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Blackbook</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Settings</h1>
+            <p class="subtitle">Configure and test Blackbook API credentials</p>
+            <nav>
+                <a href="/">Vehicle Lookup</a>
+                <a href="/admin" class="active">Admin Settings</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Credential Configuration</h2>
+                <div class="info-box">
+                    <h3>Current Configuration</h3>
+                    <p>Credentials are stored securely in the <code>.env</code> file on the server.</p>
+                    <p>To update credentials, modify the <code>.env</code> file with the following variables:</p>
+                    <ul>
+                        <li><code>BLACKBOOK_ID</code> - Your Blackbook account ID</li>
+                        <li><code>BLACKBOOK_PASSWORD</code> - Your Blackbook password</li>
+                        <li><code>BLACKBOOK_GRAPHQL_URL</code> - Blackbook GraphQL endpoint URL</li>
+                    </ul>
+                    <p class="warning">Never store credentials in browser localStorage or expose them in the frontend.</p>
+                </div>
+
+                <div class="test-section">
+                    <h3>Test Connection</h3>
+                    <p>Click the button below to verify that the configured credentials can successfully connect to the Blackbook API.</p>
+                    <button id="testCredentialsBtn" class="btn btn-primary">Test Credentials</button>
+                </div>
+
+                <div id="testLoadingIndicator" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Testing credentials...</p>
+                </div>
+
+                <div id="testErrorMessage" class="alert alert-error" style="display: none;"></div>
+                <div id="testSuccessMessage" class="alert alert-success" style="display: none;"></div>
+            </div>
+
+            <div class="card">
+                <h2>API Documentation</h2>
+                <div class="api-docs">
+                    <h3>Available Endpoints</h3>
+                    
+                    <div class="endpoint">
+                        <h4>POST /api/fetch-vehicle</h4>
+                        <p>Fetch vehicle data from Blackbook API</p>
+                        <pre><code>{
+  "vin": "1HGBH41JXMN109186",
+  "odometer": 50000
+}</code></pre>
+                        <p><strong>Rate Limit:</strong> 20 requests per minute</p>
+                    </div>
+
+                    <div class="endpoint">
+                        <h4>POST /api/test-credentials</h4>
+                        <p>Test Blackbook API credentials</p>
+                        <p><strong>Rate Limit:</strong> 10 requests per minute</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/admin.js"></script>
+</body>
+</html>
